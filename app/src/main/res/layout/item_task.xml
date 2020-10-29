@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="itemTask"
+            type="com.example.recyclerviewinkotlin.db.userdata.Task" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/_15dp"
+        android:background="@color/teal_200">
+
+        <TextView
+            android:id="@+id/task_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{itemTask.fleet_id+``}"
+            android:textColor="@android:color/black"
+            android:lines="1"
+            android:textSize="@dimen/_20sp" />
+
+        <TextView
+            android:id="@+id/task_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/task_id"
+            android:layout_marginTop="@dimen/_10dp"
+            android:text="@{itemTask.job_address}"
+            android:maxLines="2"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/_15sp" />
+
+    </RelativeLayout>
+</layout>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="itemTask"
+            type="com.example.recyclerviewinkotlin.db.userdata.Task" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.fragment.TaskDetailFragment"
+        android:padding="@dimen/_15dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+            <TextView
+                android:id="@+id/task_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{itemTask.fleet_id+``}"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_20sp" />
+
+            <TextView
+                android:id="@+id/task_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{itemTask.job_time}"
+                android:layout_marginTop="@dimen/_10dp"
+                android:layout_below="@+id/task_id"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_15sp" />
+
+            <TextView
+                android:id="@+id/task_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{itemTask.job_address}"
+                android:layout_marginTop="@dimen/_10dp"
+                android:layout_below="@+id/task_date"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_15sp" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</layout>
