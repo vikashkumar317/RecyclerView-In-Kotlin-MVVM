@@ -44,7 +44,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="@dimen/_20dp">
 
             <TextView
                 android:id="@+id/distanceTV"
@@ -77,7 +78,5 @@
             android:padding="@dimen/_10dp"
             />
     </LinearLayout>
-
-
 
 </LinearLayout>
