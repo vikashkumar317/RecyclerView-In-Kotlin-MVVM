@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        tools:context=".ui.fragment.MapFragment" />
+
+    <LinearLayout
+        android:id="@+id/llButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/createRoute"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/create_route"
+            android:background="@color/white"
+            android:textColor="@color/black"
+            android:padding="@dimen/_10dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llDistance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/distanceTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="10km"
+                android:textSize="@dimen/_20sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/timeTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="5 hours"
+                android:textSize="@dimen/_20sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/startBtn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="@string/start"
+            android:background="@color/white"
+            android:textColor="@color/black"
+            android:padding="@dimen/_10dp"
+            />
+    </LinearLayout>
+
+
+
+</LinearLayout>

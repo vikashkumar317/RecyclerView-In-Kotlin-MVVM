@@ -38,7 +38,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // create request body instance
-        var requestbody = RequestBody("5b6262c2a80b5f021c162e3b1d17244f1decc4fb22c10b22591a02c2c9fb","2020-10-28", "v2", "home_refresh_swipe")
+        var requestbody = RequestBody("132b31c0f906561f1c162e3c15122c471ee7ccf82fc10b225a1c07c9c0fd","2020-10-28", "v2", "home_refresh_swipe")
 
         // call getTask() method of TaskViewModel
         fragmentHomeBinding.viewmodel?.getTask(requestbody)

@@ -1,56 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <data>
-        <variable
-            name="itemTask"
-            type="com.example.recyclerviewinkotlin.db.userdata.Task" />
-    </data>
-
-    <RelativeLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.fragment.TaskDetailFragment"
+    android:orientation="vertical">
+    
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.fragment.TaskDetailFragment"
-        android:padding="@dimen/_15dp">
+        android:layout_height="wrap_content">
 
-        <RelativeLayout
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true">
+            app:tabTextColor="@color/black"
+            app:tabSelectedTextColor="@color/teal_200"
+            app:tabGravity="fill"
+            app:tabMode="fixed"
+            android:background="@color/purple_200" />
 
-            <TextView
-                android:id="@+id/task_id"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{itemTask.fleet_id+``}"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_20sp" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-            <TextView
-                android:id="@+id/task_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{itemTask.job_time}"
-                android:layout_marginTop="@dimen/_10dp"
-                android:layout_below="@+id/task_id"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_15sp" />
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-            <TextView
-                android:id="@+id/task_address"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{itemTask.job_address}"
-                android:layout_marginTop="@dimen/_10dp"
-                android:layout_below="@+id/task_date"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_15sp" />
-
-        </RelativeLayout>
-
-    </RelativeLayout>
-
-</layout>
+</LinearLayout>

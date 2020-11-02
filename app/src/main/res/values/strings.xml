@@ -2,4 +2,7 @@
     <string name="app_name">RecyclerViewInKotlin</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="create_route">Create Route</string>
+    <string name="start">Start</string>
+    <string name="google_maps_key">AIzaSyDHjZIxrZR2R9RAVCb3YXs_FOP5bbFeVgU</string>
 </resources>
