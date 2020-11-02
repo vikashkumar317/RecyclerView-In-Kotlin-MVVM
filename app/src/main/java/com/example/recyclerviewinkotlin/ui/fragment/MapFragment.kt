@@ -62,6 +62,8 @@ class MapFragment() : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // initialize itemTask from arguments data
         arguments?.let {
             itemTask = it.getParcelable("my_task")!!
         }
@@ -100,17 +102,20 @@ class MapFragment() : Fragment() {
     }
 
     private fun showDestinationLocation(googleMap: GoogleMap){
+        // add marker to destination location ( from itemTask )
         val destinationLocation = LatLng(itemTask.job_latitude.toDouble(), itemTask.job_longitude.toDouble())
         googleMap.addMarker(MarkerOptions().position(destinationLocation).title("Destination Location"))
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destinationLocation, 10f))
         //googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.Builder().target(googleMap.cameraPosition.target).zoom(17f).bearing(30f).tilt(45f).build()))
 
+        // when createRoute Button is clicked
         createRoute.setOnClickListener {
             checkLocationPermission(googleMap, destinationLocation)
         }
     }
 
     private fun checkLocationPermission(googleMap: GoogleMap, destinationLoc: LatLng) {
+        // check if user gives permission for ACCESS FINE LOCATION and ACCESS COARSE LOCATION
         if (ActivityCompat.checkSelfPermission(this.requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this.requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.checkSelfPermission(this.requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this.requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -127,10 +132,18 @@ class MapFragment() : Fragment() {
                 }
             }
         } else {
+            // get reference of Location Manager
             val locationManager = mContext.getSystemService(LOCATION_SERVICE) as LocationManager
+
+            // get Last Location using GPS
             // https://stackoverflow.com/questions/5757565/how-to-find-my-current-location-latitude-longitude-on-click-of-a-button-in-a
             var location: Location? = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+
+            // if GPS Last location is not available try to get Last Location using network provider
             if(location == null) location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+
+            // if last location from both provider is not available
+            // then wait until GPS provider gives current location
             while(location == null){
                 var tempLoc: Location? = null
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1f, LocationListener{
@@ -139,43 +152,50 @@ class MapFragment() : Fragment() {
                 location = tempLoc
             }
             if(location != null){
+                //
                 var sourceLocation: LatLng = LatLng(location.latitude, location.longitude)
                 googleMap.addMarker(MarkerOptions().position(sourceLocation).title("Source Location"))
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sourceLocation, 5f))
 
+                // create url using source and destination location
                 var url = "json?mode=driving&transit_routing_preference=less_driving&origin="+sourceLocation.latitude+","+sourceLocation.longitude+"&destination="+destinationLoc.latitude+","+destinationLoc.longitude+"&key="+resources.getString(R.string.google_maps_key)
+
+                // call googleapis to get route data between source and destination
                 RouteViewModel().getRouteData(url).observe(this, Observer {
                     llButton.visibility = View.GONE
                     llDistance.visibility = View.VISIBLE
 
+                    // show distance between source and destination
                     distanceTV.text = it.routes[0].legs[0].distance.text
+
+                    // show required duration to cover distance between source and destination
                     timeTV.text = it.routes[0].legs[0].duration.text
 
+                    // get List of LatLng after decoding polyline points of steps
                     var path = ArrayList<LatLng>()
                     for (x in it.routes[0].legs[0].steps){
                         path.addAll(decodePoly(x.polyline.points))
                     }
 
-                    // Adjusting Bounds
+                    // Adjusting Bounds (show local area between start and end position)
                     var builder = LatLngBounds.Builder()
                     for(x in path) builder.include(x)
                     var bounds = builder.build()
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 10))
 
+                    // draw route of blue color between start and end position
                     var polylineOptions = PolylineOptions()
                     polylineOptions.color(Color.BLUE)
                         .width(5f)
-                        .startCap(SquareCap())
-                        .endCap(SquareCap())
-                        .jointType(JointType.ROUND)
                         .addAll(path)
                     googleMap.addPolyline(polylineOptions)
 
+                    // when startBtn is clicked
                     startBtn.setOnClickListener(View.OnClickListener {
                         llDistance.visibility = View.GONE
-                        Handler().postDelayed(Runnable {
-                            showMovingCab(path, googleMap)
-                        }, 300)
+
+                        // start cab movement
+                        showMovingCab(path, googleMap)
                     })
                 })
             }
@@ -186,6 +206,8 @@ class MapFragment() : Fragment() {
     private fun showMovingCab(cabLatLngList: ArrayList<LatLng>, googleMap: GoogleMap) {
         handler = Handler()
         var index = 0
+
+        // update car location until car reaches destination position
         runnable = Runnable {
             run {
                 if (index < cabLatLngList.size) {
@@ -200,36 +222,52 @@ class MapFragment() : Fragment() {
         handler.postDelayed(runnable, 500)
     }
 
+    // return bitMap image of Car
     private fun getCarBitmap(): Bitmap {
         val bitmap = BitmapFactory.decodeResource(mContext.resources, R.drawable.ic_car)
         return Bitmap.createScaledBitmap(bitmap, 50, 100, false)
     }
 
+    // to update car Location
     private fun updateCarLocation(latLng: LatLng, googleMap: GoogleMap) {
         var tempRotation = 0f;
 
+        // add Car Marker
         if (movingCabMarker == null) {
             movingCabMarker = addCarMarkerAndGet(latLng, googleMap)
         }
+
+        // for source position
         if (previousLatLng == null) {
             currentLatLng = latLng
             previousLatLng = currentLatLng
             movingCabMarker?.position = currentLatLng
             movingCabMarker?.setAnchor(0.5f, 0.5f)
             animateCamera(currentLatLng!!, googleMap)
-        } else {
+        }
+
+        // except source position
+        else {
             previousLatLng = currentLatLng
             currentLatLng = latLng
             val valueAnimator = carAnimator()
             valueAnimator.addUpdateListener { va ->
                 if (currentLatLng != null && previousLatLng != null) {
+
+                    // calculate next Location using fraction value
                     val multiplier = va.animatedFraction
                     val nextLocation = LatLng(
                         multiplier * currentLatLng!!.latitude + (1 - multiplier) * previousLatLng!!.latitude,
                         multiplier * currentLatLng!!.longitude + (1 - multiplier) * previousLatLng!!.longitude
                     )
+
+                    // place cab on the calculated position (next Location)
                     movingCabMarker?.position = nextLocation
+
+                    // place cab in the middle with respect to the route
                     movingCabMarker?.setAnchor(0.5f, 0.5f)
+
+                    // move camera and map according to position change and bearing value
                     var cameraPosition = CameraPosition.Builder().target(nextLocation).zoom(12f)
 
                     val rotation = getRotation(previousLatLng!!, nextLocation)
@@ -248,15 +286,7 @@ class MapFragment() : Fragment() {
         }
     }
 
-    private fun bitmapDescriptorFromVector(context: Context, vectorResId: Int): BitmapDescriptor? {
-        return ContextCompat.getDrawable(context, vectorResId)?.run {
-            setBounds(0, 0, intrinsicWidth, intrinsicHeight)
-            val bitmap = Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888)
-            draw(Canvas(bitmap))
-            BitmapDescriptorFactory.fromBitmap(bitmap)
-        }
-    }
-
+    // angle between start position and end position
     fun getRotation(start: LatLng, end: LatLng): Float {
         val latDifference: Double = abs(start.latitude - end.latitude)
         val lngDifference: Double = abs(start.longitude - end.longitude)
@@ -279,6 +309,7 @@ class MapFragment() : Fragment() {
         return rotation
     }
 
+    // car valueAnimator using LinearInterpolator
     private fun carAnimator(): ValueAnimator {
         val valueAnimator = ValueAnimator.ofFloat(0f, 1f)
         valueAnimator.duration = 3000
@@ -286,18 +317,13 @@ class MapFragment() : Fragment() {
         return valueAnimator
     }
 
-    private fun polylineAnimator(): ValueAnimator {
-        val valueAnimator = ValueAnimator.ofInt(0, 100)
-        valueAnimator.interpolator = LinearInterpolator()
-        valueAnimator.duration = 4000
-        return valueAnimator
-    }
-
+    // animate camera position according to given position
     private fun animateCamera(latLng: LatLng, googleMap: GoogleMap) {
         val cameraPosition = CameraPosition.Builder().target(latLng).zoom(15.5f).build()
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
     }
 
+    // return Car Marker
     private fun addCarMarkerAndGet(latLng: LatLng, googleMap: GoogleMap): Marker {
         val bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(getCarBitmap())
         return googleMap.addMarker(
@@ -305,6 +331,7 @@ class MapFragment() : Fragment() {
         )
     }
 
+    // to decode Poly
     private fun decodePoly(encoded: String): List<LatLng> {
         val poly = ArrayList<LatLng>()
         var index = 0
@@ -342,9 +369,11 @@ class MapFragment() : Fragment() {
         return poly
     }
 
+
     companion object {
         private const val MY_TASK = "my_task"
 
+        // return MapFragment instance
         @JvmStatic
         fun newInstance(task: Task): MapFragment{
             val fragment = MapFragment()
